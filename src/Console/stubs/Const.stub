@@ -1,0 +1,5 @@
+    /**
+    *{{ name }}
+    *@var {{ type }}
+    */
+    const {{ id }}='{{ value }}';

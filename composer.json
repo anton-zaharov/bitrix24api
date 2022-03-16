@@ -1,0 +1,21 @@
+{
+    "name": "anton-zaharov/bitrix24api",
+    "description": "Eloquent wrapper for connection to Bitrix24 API with classes generators",
+    "require": {
+	"php": "^7.4|^8.0"
+    },
+    "authors": [
+        {
+            "name": "Anton Zakharov",
+            "email": "anton.zakharov.m@yandex.ru"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Bitrix24api\\": "src/"
+        }
+    }
+}

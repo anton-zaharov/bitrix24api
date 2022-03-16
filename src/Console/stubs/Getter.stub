@@ -1,0 +1,6 @@
+    /**
+    * getter {{ name }} - {{ id }} - {{ value }}
+    */
+    public function get{{ tok }}() {
+       return $this->{{ value }};
+    }

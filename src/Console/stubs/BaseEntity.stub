@@ -1,0 +1,9 @@
+<?php
+
+namespace {{ namespace }};
+use App\Bitrix24\Base\BitrixModel;
+
+class {{ class }} extends BitrixModel {
+{{ protected }}
+{{ functions }}
+}

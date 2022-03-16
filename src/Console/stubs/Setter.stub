@@ -1,0 +1,6 @@
+    /**
+    * setter {{ name }} - {{ id }} - {{ value }}
+    */
+    public function set{{ tok }}($value) {
+       $this->{{ value }} = $value;
+    }
