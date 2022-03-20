@@ -32,6 +32,7 @@ class ServiceProvider extends ServiceProviderBase {
             Console\BitrixEntity::class,
             Console\Import::class
         ]);
+        require_once (__DIR__ . '/crest.php');
     }
 
 }
