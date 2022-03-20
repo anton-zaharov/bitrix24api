@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix24api;
 use Illuminate\Support\Str;
-use App\Bitrix24\CRest;
+use \CRest;
 
 /**
  * Description of ImportBitrix
@@ -31,7 +31,8 @@ class ImportBitrix {
         $result = CRest::call("$module.$className.fields", []);
         
         if (empty($result['result'])) {
-            throw new \Exception("$module.$className.fields " . $result['error_description']);
+            dd($result);
+            throw new \Exception("$module.$className.fields " . $result['error_information']??'');
         }
         return $result['result'];
     }

@@ -6,11 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Connection as ConnectionBase;
 use Illuminate\Database\Grammar as GrammerBase;
-use Illuminate\Database\Query\Processors\Processor as ProcessorBase;
-use App\Bitrix24\Processor as Processor;
-use Illuminate\Support\Facades\Cache;
-use RuntimeException;
-use App\Bitrix24\CRest;
+use \CRest;
 
 class Connection extends ConnectionBase
 {
