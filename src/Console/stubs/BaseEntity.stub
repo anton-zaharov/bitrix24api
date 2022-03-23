@@ -1,7 +1,7 @@
 <?php
 
 namespace {{ namespace }};
-use App\Bitrix24\Base\BitrixModel;
+use Bitrix24api\BitrixModel;
 
 class {{ class }} extends BitrixModel {
 {{ protected }}

@@ -6,6 +6,6 @@ class Bitrix24 extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return App\Bitrix24\Classes\Service::class;
+        return \App\Bitrix24\Classes\Service::class;
     }
 }

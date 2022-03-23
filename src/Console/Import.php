@@ -70,7 +70,7 @@ class Import extends GeneratorCommand {
     public function handle() {
         $module = 'crm';
         $entity = $this->argument('name');
-        $this->type = $entity;
+        
         $this->module = $module;
         ImportBitrix::setCom($this);
         if (strpos($entity, '.') !== FALSE) {
@@ -99,6 +99,7 @@ class Import extends GeneratorCommand {
             case 'crm.Status':
             case 'calendar.resource':
                 $this->template = 'Class';
+                $this->type = $entity;
                 $entity_id = $this->option('entity_id');
                 $this->statuses($entity, $module, $entity_id);
                 break;

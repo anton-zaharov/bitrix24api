@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix24api;
 use Illuminate\Support\Str;
-use \CRest;
+use Bitrix24api\CRest;
 
 /**
  * Description of ImportBitrix

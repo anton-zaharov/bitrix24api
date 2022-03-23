@@ -29,7 +29,7 @@ class Batch
             }
             return [$key => $q];
         })->all();
-        $r = \CRest::callBatch($batch);
+        $r = CRest::callBatch($batch);
         if (isset($r['result']['result']))
         {
             $r = $r['result']['result'];

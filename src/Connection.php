@@ -6,7 +6,9 @@ use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Connection as ConnectionBase;
 use Illuminate\Database\Grammar as GrammerBase;
-use \CRest;
+use Illuminate\Database\Query\Processors\Processor as ProcessorBase;
+use Bitrix24api\Processor as Processor;
+use Bitrix24api\CRest;
 
 class Connection extends ConnectionBase
 {

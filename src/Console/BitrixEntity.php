@@ -2,7 +2,7 @@
 namespace Bitrix24api\Console;
 
 use Illuminate\Console\Command;
-use \CRest;
+use Bitrix24api\CRest;
 /**
  * Description of BitrixEntity
  *
