@@ -13,7 +13,35 @@ here:
 
 https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=99&LESSON_ID=8579
 
+After the installation request Bitrix will show two secret variables, and you must define them in bootstrap/app.php
+
+```
+define('C_REST_CLIENT_ID', 'local.6213b......fe3.5016....');
+define('C_REST_CLIENT_SECRET', 'e6KYiMcVRgDTqjM.............1TPXUTxxHEO6qmKf');
+```
+
+Also recomended 
+
+`define('C_REST_BLOCK_LOG', true);`
+
+for prevent logging every request to the Bitrix api.
+
+## Configuration
+
+In the config/database.php add next section to the connections array:
+
+```
+'bitrix24' => [
+            'driver' => 'bitrix24',
+            'database' => '',
+            'prefix' => '',
+        ],
+```
+
+Thats all.
+
 ## Console command
+
 php artisan will show 2 command
 
 bitrix:import           Импорт классов из Битрикс24. Сущности: lead, deal, status, параметр --entity_id= направление для статусов
