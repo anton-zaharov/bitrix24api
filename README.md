@@ -28,7 +28,7 @@ for prevent logging every request to the Bitrix api.
 
 ## Configuration
 
-In the config/database.php add next section to the connections array:
+In the config/database.php add following element to the connections array:
 
 ```
 'bitrix24' => [
@@ -44,7 +44,7 @@ Thats all.
 
 php artisan will show 2 command
 
-bitrix:import           Импорт классов из Битрикс24. Сущности: lead, deal, status, параметр --entity_id= направление для статусов
+bitrix:import           Импорт классов из Битрикс24. Сущности: crm.lead, crm.deal, crm.status with --entity_id=<deal direction> и так далее 
 
 bitrix:references-list  Возвращает описание типов справочников.
 

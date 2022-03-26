@@ -3,6 +3,10 @@
 namespace {{ namespace }};
 use App\Bitrix24\Base\Base{{ class }};
 
+/*
+ * Класс сущности Битрикс24, наследует методы и свойства модели Eloquent
+ * Можно переименовать класс с соблюдением стандарта PSR-4
+ */
 class {{ class }} extends Base{{ class }} {
     protected $table = '{{ module }}.{{ class }}';
     protected $primaryKey = 'ID';

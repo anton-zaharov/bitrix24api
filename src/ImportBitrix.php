@@ -20,8 +20,6 @@ class ImportBitrix {
         self::$com = $com;
     }
     static public function Status($className, $module, $entity = null) {
-        $camelClassName = Str::camel(mb_strtolower($className));
-        $UpClassName = ucfirst($camelClassName);
         $params = [ 'order' => ["SORT" => "ASC"], 'filter'=>[]];
         if (isset($entity)) { $params['filter'] = ["ENTITY_ID" => $entity]; }
         $result = CRest::call("$module.$className.list", $params);

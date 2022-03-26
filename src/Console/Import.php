@@ -17,7 +17,7 @@ class Import extends GeneratorCommand {
      */
     protected $signature = 'bitrix:import 
                            {name : Импортируемая сущность}
-                           {--entity_id=0}
+                           {--direction=}
                            {--force=1}'
     ;
 
@@ -27,7 +27,7 @@ class Import extends GeneratorCommand {
      * @var string
      */
     protected $description = 'Импорт классов из Битрикс24. ' . PHP_EOL
-            . 'Сущности: lead, deal, status, параметр --entity_id= направление для статусов';
+            . 'Сущности: crm.lead, crm.deal with --direction,  see help';
     protected $template = 'Entity';
 
     protected function getStub() {
@@ -70,7 +70,10 @@ class Import extends GeneratorCommand {
     public function handle() {
         $module = 'crm';
         $entity = $this->argument('name');
-        
+        if ($entity === 'help') {
+            $this->help();
+            return;
+        }
         $this->module = $module;
         ImportBitrix::setCom($this);
         if (strpos($entity, '.') !== FALSE) {
@@ -99,8 +102,9 @@ class Import extends GeneratorCommand {
             case 'crm.Status':
             case 'calendar.resource':
                 $this->template = 'Class';
-                $this->type = $entity;
-                $entity_id = $this->option('entity_id');
+                $entity_id = $this->option('direction')??'STATUS';
+                $camelClassName = Str::camel(mb_strtolower($entity_id));
+                $this->type = ucfirst($camelClassName);
                 $this->statuses($entity, $module, $entity_id);
                 break;
             default:
@@ -145,7 +149,7 @@ class Import extends GeneratorCommand {
             }
             if (isset($r['propertyType']) && $r['propertyType'] === 'L') {
                 foreach ($r['values'] as $v) {
-                    self::insertFieldConst($this->content, $v['VALUE'], 'Значение списка', "{$r['title']}_{$v['VALUE']}", $v['ID']);
+                    $this->makeConsts($this->content, $v['VALUE'], 'Значение списка', "{$r['title']}_{$v['VALUE']}", $v['ID']);
                 }
             }
         }
@@ -205,7 +209,24 @@ class Import extends GeneratorCommand {
         $output['functions'][] = str_replace(['{{ name }}', '{{ tok }}', '{{ id }}', '{{ value }}'],
                 [$name, $tok, $id, $value], $setterSlug);
     }
+    
+    protected function help(){
+        $this->info('Комманда генерирует класс для любой сущности Битрикс24, имеющей метод fields.
+Для сделок, направление сделки задается после генерирования класса установкой поля attributes
+Id направлений можно узнать коммандой 
+   php artisan bitrix:references-list
 
+Также можно генерировать классы с перечнем статусов для направлений.
+Например, генерировать класс Статусов для лидов можно коммандой
+    php artisan ditrix:import crm.status --derection=STATUS
+    
+класс статусов для Сделок направления DEAL_STAGE_1
+    php artisan ditrix:import crm.status --derection=DEAL_STAGE_1
+    
+');
+
+        
+    }
 }
 
 function translit($name) {
