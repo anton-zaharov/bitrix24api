@@ -12,6 +12,8 @@ class {{ class }} extends Base{{ class }} {
     protected $primaryKey = 'ID';
     public $timestamps = false;
 {{ attributes }}
-    public function _({{ class }} $v):{{ class }} {return $v;}
+    
+// add your code here
+
 }
 
