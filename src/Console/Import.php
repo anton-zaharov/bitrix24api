@@ -17,8 +17,9 @@ class Import extends GeneratorCommand {
      */
     protected $signature = 'bitrix:import 
                            {name : Импортируемая сущность}
-                           {--direction=}
-                           {--force=1}'
+                           {--entity_id=0}
+                           {--force=1}
+                           {--class=}'
     ;
 
     /**
@@ -27,7 +28,7 @@ class Import extends GeneratorCommand {
      * @var string
      */
     protected $description = 'Импорт классов из Битрикс24. ' . PHP_EOL
-            . 'Сущности: crm.lead, crm.deal with --direction,  see help';
+            . 'Сущности: crm.lead, crm.deal etc., see help';
     protected $template = 'Entity';
 
     protected function getStub() {
@@ -45,8 +46,9 @@ class Import extends GeneratorCommand {
     protected function buildClass($name) {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceMyStubs($stub, $name)
-                        ->replaceClass($stub, $name)
+        return $this->replaceNamespace($stub, $name)->replaceMyStubs($stub)
+                    ->replaceEntity($stub, $this->entity)
+                    ->replaceClass($stub, $name)
         ;
     }
 
@@ -80,6 +82,7 @@ class Import extends GeneratorCommand {
             list ($module, $entity) = explode('.', $entity);
         }
         $entity = ucfirst($entity);
+        $this->entity = $entity;
         switch ("$module.$entity") {
 
             case 'crm.Deal':
@@ -96,15 +99,14 @@ class Import extends GeneratorCommand {
             case 'crm.Lead':
             case 'crm.Product':
                 $this->template = 'Entity';
-                $this->type = $entity;
+                $this->type = $this->option('class')??$entity;
                 $this->mask_force = 0;
                 break;
             case 'crm.Status':
             case 'calendar.resource':
                 $this->template = 'Class';
-                $entity_id = $this->option('direction')??'STATUS';
-                $camelClassName = Str::camel(mb_strtolower($entity_id));
-                $this->type = ucfirst($camelClassName);
+                $this->type = $this->option('class')??$entity;
+                $entity_id = $this->option('entity_id');
                 $this->statuses($entity, $module, $entity_id);
                 break;
             default:
@@ -149,7 +151,7 @@ class Import extends GeneratorCommand {
             }
             if (isset($r['propertyType']) && $r['propertyType'] === 'L') {
                 foreach ($r['values'] as $v) {
-                    $this->makeConsts($this->content, $v['VALUE'], 'Значение списка', "{$r['title']}_{$v['VALUE']}", $v['ID']);
+                    self::insertFieldConst($this->content, $v['VALUE'], 'Значение списка', "{$r['title']}_{$v['VALUE']}", $v['ID']);
                 }
             }
         }
@@ -169,15 +171,24 @@ class Import extends GeneratorCommand {
         $output['protected'][] = str_replace(['{{ name }}', '{{ type }}', '{{ id }}', '{{ value }}'],
                 [$name, $type, $id, $value], $constSlug);
     }
-
+    
+    /**
+     * Replace entity name
+     * @param string $stub
+     * @param string $entity
+     */
+    protected function replaceEntity(&$stub, $entity=null) {
+        $stub = str_replace(['{{ entity }}', '{{entity}}'], $entity??$this->entity, $stub);
+        return $this;
+    }
+    
     /**
      * Replace the class name for the given stub.
      *
      * @param  string  $stub
-     * @param  string  $name
      * @return string
      */
-    protected function replaceMyStubs(&$stub, $name) {
+    protected function replaceMyStubs(&$stub) {
         $stub = str_replace(['{{ attributes }}', '{{attributes}}'], $this->content['attributes'] ?? '', $stub);
         $stub = str_replace(['{{ protected }}', '{{protected}}'], $this->content['protected'] ?? '', $stub);
         $stub = str_replace(['{{ functions }}', '{{functions}}'], $this->content['functions'] ?? '', $stub);
@@ -211,21 +222,15 @@ class Import extends GeneratorCommand {
     }
     
     protected function help(){
-        $this->info('Комманда генерирует класс для любой сущности Битрикс24, имеющей метод fields.
-Для сделок, направление сделки задается после генерирования класса установкой поля attributes
-Id направлений можно узнать коммандой 
+        $this->output('Комманда генерирует класс для любой сущности Битрикс24, имеющей метод fields.
+Опция --class задает имя генерируемого класса.
+Id CRM справочников Битрикс, в том числе направления, можно узнать коммандой 
    php artisan bitrix:references-list
 
-Также можно генерировать классы с перечнем статусов для направлений.
-Например, генерировать класс Статусов для лидов можно коммандой
-    php artisan ditrix:import crm.status --derection=STATUS
-    
-класс статусов для Сделок направления DEAL_STAGE_1
-    php artisan ditrix:import crm.status --derection=DEAL_STAGE_1
-    
-');
-
-        
+Также можно генерировать классы с перечнем статусов для направлений, но в этом случае следует указывать 
+символьный идентификатор направления. Например, генерировать класс Статусов для общего направления нужно коммандой
+    php artisan ditrix:import crm.status --entity_id=STATUS');
+           
     }
 }
 
