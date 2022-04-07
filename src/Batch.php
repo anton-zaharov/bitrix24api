@@ -16,6 +16,11 @@ class Batch
             $this->queries->put($key, compact('method', 'params'));
         }
     }
+    
+    public function remove($key){
+        $this->queries->forget($key);
+    }
+    
     public function keys()
     {
         return $this->queries->keys();
