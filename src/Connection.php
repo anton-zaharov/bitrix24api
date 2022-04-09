@@ -25,7 +25,7 @@ class Connection extends ConnectionBase
     {
         $grammar = app(Grammar::class);
         $grammar->setConfig($this->getConfig());
-
+        
         return $this->withTablePrefix($grammar);
     }
     

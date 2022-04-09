@@ -101,7 +101,8 @@ app/Bitrix24/Deal.php
 ```
 
 файл Deal.php можно редактировать, дополняя константы или методы с привычными именами.
-Также в этом файле в поле $attributes можно задать направление сделки, которое будет добавляться ко всем запросам к Bitrix24 api.
+Также в этом файле в поле $attributes можно задать направление сделки, которое будет 
+автоматически заполняться при создании новой сделки. 
 Требуется указать числовой id, который для направления DEAL_STAGE_9 равен 9.
 
 `protected $attributes = [ 'CATEGORY_ID' => 9 ];`
@@ -109,25 +110,50 @@ app/Bitrix24/Deal.php
 При повторном выполнении команды класс BaseDeal.php будет перезаписываться всегда. Это необходимо для обновления свойств класса после добавления к сделке пользовательского поля на стороне Битрикс24.
 Класс Deal.php перезаписываться не будет, чтобы не затереть ваши кастомные правки. Сообщение об этом будет в выводе консольной команды.
 
-Сгенерируем класс с перечнем этапов направленя DEAL_STAGE_9
+Напомним, модель Eloquent позволяет добавить scope, фильтрующий, например, все сделки по выбранному направлению.
 
 ```
-php artisan bitrix:import crm.status --direction=DEAL_STAGE_9
+use Illuminate\Database\Eloquent\Builder;
+
+protected static function booted()
+    {
+        static::addGlobalScope('pears', function (Builder $builder) {
+            $builder->where('CATEGORY_ID', 9);
+        });
+    }
 ```
 
-Итогом команды будет класс 
+ 
+Сгенерируем класс статусов (этапов) направленя DEAL_STAGE_9
+
+```
+php artisan bitrix:import crm.status --entity_id=DEAL_STAGE_9
+```
+
+Итогом команды будет класс со статическими свойствами - этапами сделки. 
 
 `app/Bitrix24/DealStage9`
 
 ##How to
 
-Прочитаем из api Сделку с id=21, поменяем ей статус и сохраним.
+Создадим новую сделку, заново прочитаем ее, поменяем ей статус и снова сохраним.
 
 ```
 use app\Bitrix24\Deal
 /...
 
-$deal = Deal::find(21);
-$deal->setStageId(DealStage9::PREPARATION);
-$deal->save();
+    $deal = new Deal();
+    $deal->setTitle('Тестовая сделка');
+    $deal->setStageId(DealStage9::PREPARATION);
+    $deal->save();
+        
+    echo ($deal->getId());
+       
+    $id = $deal->getId();
+    $same = Deal::find($id);
+    $same->setStageId(DealStage9::PREPAYMENT_INVOICE);
+    $same->save();
+    echo('<pre>');
+    var_export($same->toArray());
+    echo('</pre>');
 ```

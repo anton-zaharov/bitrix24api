@@ -32,12 +32,7 @@ class Grammar extends GrammarBase {
         'between' => '><'
     ];
     
-    protected function detectGet(Builder $query){
-        return (false && count($query->wheres) === 1 
-                && $query->wheres[0]['type'] === 'Basic'
-                && str_ends_with($query->wheres[0]['column'],'.id') 
-                );
-    } 
+    
     public function mapQuery(Builder $query): array {
         $operators = &$query->operators;
         $params = [];
@@ -75,7 +70,11 @@ class Grammar extends GrammarBase {
                     break;
                 case 'In':
                 case 'InRaw':
-                    $params['filter']["=$key"] = $where['values'];
+                    if ($this->selectWord === 'get') {
+                        $params["ID"] = $where['values'][0];
+                    } else {
+                        $params['filter']["=$key"] = $where['values'];
+                    }
                     break;
 
                 case 'between':
@@ -112,28 +111,7 @@ class Grammar extends GrammarBase {
 
     public function compileSelect(Builder $query): string {
         $params = $this->mapQuery($query);
-        //dd($params);
-        if ($this->detectGet($query)){
-            $url = "{$query->from}.get";
-            $params = ['ID' => $params['filter']['=id'][0] ];
-        } else {
-            $url = "{$query->from}.list";
-        }
-        if (!empty($params)) {
-            /*             * $url .= '?';
-              $queryStr = Str::httpBuildQuery(
-              $params,
-              !empty($this->config['pluralize_array_query_params']),
-              $this->config['pluralize_except'] ?? [],
-              );
-              if ($queryStr === false) {
-              return false;
-              }
-              $url .= $queryStr;
-             * 
-             */
-        }
-
+        $url = "{$query->from}.{$this->selectWord}";
         return serialize(['method' => $url, 'params' => $params]);
     }
 
