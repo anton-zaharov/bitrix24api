@@ -71,7 +71,7 @@ class Import extends GeneratorCommand {
     }
     public function handle() {
         $module = 'crm';
-        $entity = $this->argument('name');
+        $entity = ucfirst($this->argument('name'));
         if ($entity === 'help') {
             $this->help();
             return;
@@ -79,9 +79,11 @@ class Import extends GeneratorCommand {
         $this->module = $module;
         ImportBitrix::setCom($this);
         if (strpos($entity, '.') !== FALSE) {
-            list ($module, $entity) = explode('.', $entity);
+            $list = explode('.', $entity);
+            $module = array_shift($list);
+            $entity = implode('', array_map('ucfirst', $list));
         }
-        $entity = ucfirst($entity);
+        
         $this->entity = $entity;
         switch ("$module.$entity") {
 
@@ -90,7 +92,7 @@ class Import extends GeneratorCommand {
             case 'crm.Product':
                 $this->template = 'BaseEntity';
                 $this->type = "/Base/Base$entity";
-                $res = $this->withSetters($entity, $module);
+                $res = $this->withSetters($list??$entity, $module);
                 $this->flatten();
                 parent::handle();
                 $this->content = [];
@@ -112,7 +114,7 @@ class Import extends GeneratorCommand {
             default:
                 $this->template = 'BaseEntity';
                 $this->type = "/Base/Base$entity";
-                $res = $this->withSetters($entity, $module);
+                $res = $this->withSetters($list??$entity, $module);
                 $this->flatten();
                 parent::handle();
                 $this->content = [];
@@ -137,16 +139,16 @@ class Import extends GeneratorCommand {
     }
 
     protected function withSetters($entity, $module) {
-        $res = ImportBitrix::EntityFields($entity, $module);
-        $UpClassName = ucfirst($entity);
+        $method = is_array($entity)?implode('.', $entity):$entity;
+        $res = ImportBitrix::EntityFields($method, $module);
 
         foreach ($res ?? [] as $key => $r) {
             if (str_starts_with($key, 'UF')) {
-                $propertyName = config("bitrix.map.$entity.{$r['listLabel']}", mb_strtoupper(translit($r['listLabel'])));
+                $propertyName = mb_strtoupper(translit($r['listLabel']));
                 self::insertFieldConst($this->content, $r['listLabel'], $r['type'],
                         $propertyName, $key);
             } else {
-                $propertyName = config("bitrix.map.$entity.{$r['title']}", mb_strtoupper(translit($r['title'])));
+                $propertyName = mb_strtoupper(translit($r['title']));
                 self::insertFieldConst($this->content, $r['title'], $r['type'], $r['type'] === 'product_property' ? $propertyName : $key, $key);
             }
             if (isset($r['propertyType']) && $r['propertyType'] === 'L') {

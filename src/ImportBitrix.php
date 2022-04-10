@@ -31,9 +31,9 @@ class ImportBitrix {
         $result = CRest::call("$module.$className.fields", []);
         
         if (empty($result['result'])) {
-            throw new \Exception("$module.$className.fields " . $result['error_information']??'');
+            throw new \Exception("$module.$className.fields " . ($result['error_information']??$result['error_description']));
         }
-        return $result['result'];
+        return isset($result['result']['fields'])?$result['result']['fields']:$result['result'];
     }
 }    
 
