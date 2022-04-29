@@ -105,6 +105,7 @@ class Import extends GeneratorCommand {
                 $this->mask_force = 0;
                 break;
             case 'crm.Status':
+            case 'crm.Source':
             case 'calendar.resource':
                 $this->template = 'Class';
                 $this->type = $this->option('class')??$entity;
