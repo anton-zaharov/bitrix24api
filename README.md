@@ -40,6 +40,22 @@ In the config/database.php add following element to the connections array:
 
 Thats all.
 
+## Incoming hook auth middleware
+
+For incoming hook from your bitrix is possible to register auth middleware in bootstrap/app.php
+
+```
+
+$app->routeMiddleware([
+    'auth_hook' => Bitrix24api\HookCheckMemberIdMiddleware::class,
+]);
+
+//and use it in route
+
+$router->post('hooktest', ['middleware' => 'auth_hook', 'uses' => 'BitrixController@hooktest', 'as' => 'hooktest']);
+
+```
+
 ## Console command
 
 Пакет добаляет две консольных команды к списку 
