@@ -32,15 +32,20 @@ class LocalCache extends GeneratorCommand {
     }
     protected function getPath($name) {
         $p = app()->basePath('database/migrations/') . date('Y-m-d_') 
-                . Str::padLeft((time() - strtotime('today')), 6) . '_'. $this->argument('name') 
+                . Str::padLeft((time() - strtotime('today')), 6,'0') . '_'. $this->getTableName() 
                 . '.php'; 
         return $p;
     }
-    protected function getNameInput()
+    protected function getNameInput(){
+        $n = explode('.', $this->argument('name'));
+        $v = array_shift($n);
+        return $v . implode('', array_map(function($i){ return Str::of($i)->ucfirst();}, $n));
+    }
+    protected function getTableName()
     {   
         $n = explode('.', $this->argument('name'));
         $v = array_pop($n);
-        return implode('_', $n) . '_' . Str::plural($v);
+        return implode('', $n) . '_' . Str::plural($v);
     }
     protected function buildClass($name) {
         $stub = $this->files->get($this->getStub());
@@ -49,6 +54,7 @@ class LocalCache extends GeneratorCommand {
     }
     protected function replaceContent(&$stub ) {
         $stub = str_replace(['{{ content }}', '{{content}}'], $this->content, $stub);
+        $stub = str_replace(['{{ table }}', '{{table}}'], $this->getTableName(), $stub);
         return $this;
     }
     
