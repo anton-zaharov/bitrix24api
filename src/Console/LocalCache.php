@@ -33,7 +33,7 @@ class LocalCache extends GeneratorCommand {
     protected function getPath($name) {
         $n = $this->getArrayName();
         array_unshift($n, 'create');
-        $p = app()->basePath('database/migrations/') . date('Y-m-d_') 
+        $p = app()->basePath('database/migrations/') . date('Y_m_d_') 
                 . Str::padLeft((time() - strtotime('today')), 6,'0') . '_'. implode('_', $n) 
                 . '.php'; 
         return $p;
