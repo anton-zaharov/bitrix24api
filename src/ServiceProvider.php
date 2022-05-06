@@ -30,7 +30,8 @@ class ServiceProvider extends ServiceProviderBase {
 
         $this->commands([
             Console\BitrixEntity::class,
-            Console\Import::class
+            Console\Import::class,
+            Console\LocalCache::class
         ]);
     }
 
