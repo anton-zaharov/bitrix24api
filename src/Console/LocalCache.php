@@ -78,8 +78,13 @@ class LocalCache extends GeneratorCommand {
         $content = [];
         foreach ($res as $key=>$field) {
             $content[] = match($field['type']) {
-                'integer' => "\$table->integer('{$key}')" . (Str::upper($key)==='ID'?'->unique();':';'),
-                'datetime', 'string', 'char' => "\$table->string('{$key}', 255);",
+                'integer' => "\$table->integer('{$key}')" 
+                    .(Str::upper($key)==='ID'?'->unique()':'')
+                    .(!$field['isRequired']?'->nullable()':'')    
+                    .';',
+                'datetime', 'string', 'char' => "\$table->string('{$key}', 255)"
+                    . (!$field['isRequired']?'->nullable()':'')    
+                    .';',    
                 default => null        
             };
         }
