@@ -31,26 +31,31 @@ class LocalCache extends GeneratorCommand {
         return __DIR__ . "/stubs/Migration.stub";
     }
     protected function getPath($name) {
+        $n = $this->getArrayName();
+        array_unshift($n, 'create');
         $p = app()->basePath('database/migrations/') . date('Y-m-d_') 
-                . Str::padLeft((time() - strtotime('today')), 6,'0') . '_'. $this->getTableName() 
+                . Str::padLeft((time() - strtotime('today')), 6,'0') . '_'. implode('_', $n) 
                 . '.php'; 
         return $p;
     }
+    protected function getArrayName() {
+        return explode('.', $this->argument('name'));
+    }
     protected function getNameInput(){
-        $n = explode('.', $this->argument('name'));
-        $v = array_shift($n);
-        return $v . implode('', array_map(function($i){ return Str::of($i)->ucfirst();}, $n));
+        $n = $this->getArrayName();
+        array_unshift($n, 'create');
+        return implode('', array_map('ucfirst', $n));
     }
     protected function getTableName()
     {   
-        $n = explode('.', $this->argument('name'));
+        $n = $this->getArrayName();
         $v = array_pop($n);
         return implode('', $n) . '_' . Str::plural($v);
     }
     protected function buildClass($name) {
         $stub = $this->files->get($this->getStub());
         return $this->replaceContent($stub)
-                    ->replaceClass($stub, $name);
+                    ->replaceClass($stub, Str::camel($name));
     }
     protected function replaceContent(&$stub ) {
         $stub = str_replace(['{{ content }}', '{{content}}'], $this->content, $stub);
@@ -59,7 +64,6 @@ class LocalCache extends GeneratorCommand {
     }
     
     public function handle() {
-        
         $name = $this->argument('name');
         $module = 'crm';
         if (strpos($name, '.') !== FALSE) {
