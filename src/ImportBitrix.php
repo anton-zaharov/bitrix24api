@@ -27,8 +27,12 @@ class ImportBitrix {
         $result = CRest::call("$module.$className.list", $params);
         return $result['result'];
     }
-    static public function EntityFields($className, $module = 'crm'){
-        $result = CRest::call("$module.$className.fields", []);
+    static public function EntityFields($className, $module = 'crm', $entityTypeId=null){
+        $params = [];
+        if ($entityTypeId) {
+            $params['entityTypeId'] = $entityTypeId;
+        }
+        $result = CRest::call("$module.$className.fields", $params);
         
         if (empty($result['result'])) {
             throw new \Exception("$module.$className.fields " . ($result['error_information']??$result['error_description']));

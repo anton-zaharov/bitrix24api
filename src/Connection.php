@@ -58,6 +58,12 @@ class Connection extends ConnectionBase
             //dd($params);
             $result =  CRest::call($method, $params);
             $allRows = $result['result']??[];
+            if (isset($allRows['items'])) {
+                $allRows = $allRows['items'];
+            }
+            if (isset($allRows['item'])) {
+                $allRows = [$allRows['item']];
+            }
             // Convert timezone in datetime keys.
             $connectionTimezone = $this->getConfig('timezone');
             if ($connectionTimezone && !empty($result['result'])) {
@@ -96,7 +102,7 @@ class Connection extends ConnectionBase
                 }
             }
 
-            return isset($result['result'])?$result['result']:$result;
+            return isset($result['result'])?$allRows:$result;
         });
     }
     public function statement($query, $bindings = [])
@@ -106,9 +112,15 @@ class Connection extends ConnectionBase
                 return true;
             }
             $query = unserialize($query);
+            if (isset($query['params']['fields']['entityTypeId'])){
+                $query['params']['entityTypeId'] = $query['params']['fields']['entityTypeId'];
+                unset($query['params']['fields']['entityTypeId']);
+            }
             $result =  CRest::call($query['method'], $query['params']);
             $allRows = $result['result']??[];
-
+            if (isset($allRows['item'])) {
+                $allRows = [$allRows['item']];
+            }
             $this->recordsHaveBeenModified();
 
             return $allRows;

@@ -66,12 +66,17 @@ class Grammar extends GrammarBase {
                     } else {
                         throw new RuntimeException('Unsupported query where operator ' . $where['operator']);
                     }
-                    $params['filter'][$param] = $where['value'];
+                    if ($where['column'] === 'entityTypeId') {
+                        $params['entityTypeId'] = $where['value'];
+                    } else {
+                        $params['filter'][$param] = $where['value'];
+                        
+                    }
                     break;
                 case 'In':
                 case 'InRaw':
                     if ($this->selectWord === 'get') {
-                        $params["ID"] = $where['values'][0];
+                        $params["id"] = $where['values'][0];
                     } else {
                         $params['filter']["=$key"] = $where['values'];
                     }

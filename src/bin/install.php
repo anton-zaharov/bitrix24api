@@ -1,5 +1,7 @@
 <?php
-require_once (__DIR__.'/crest.php');
+//require_once (__DIR__.'/crest.php');
+
+use Bitrix24api\CRest;
 
 $result = CRest::installApp();
 if($result['rest_only'] === false):?>

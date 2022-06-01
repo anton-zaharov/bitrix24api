@@ -1,5 +1,5 @@
 <?php
-require_once (__DIR__.'/settings.php');
+//require_once (__DIR__.'/settings.php');
 
 /**
  *  @version 1.36
@@ -28,12 +28,12 @@ class CRest
 	 */
 
 	public static function installApp()
-	{
+	{   
 		$result = [
 			'rest_only' => true,
 			'install' => false
 		];
-		if($_REQUEST[ 'event' ] == 'ONAPPINSTALL' && !empty($_REQUEST[ 'auth' ]))
+		if($_REQUEST[ 'event' ]??'' == 'ONAPPINSTALL' && !empty($_REQUEST[ 'auth' ]))
 		{
 			$result['install'] = static::setAppSettings($_REQUEST[ 'auth' ], true);
 		}

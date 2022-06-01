@@ -3,12 +3,19 @@
 namespace Bitrix24api;
 include_once __DIR__.'/bin/crest.php';
 use \CRest as BaseRest;
+use Illuminate\Support\Facades\Log;
 /**
  * Description of CRest
  *
  * @author HP
  */
 class CRest extends BaseRest {
+    public static function installApp(){
+        Log::info($_REQUEST);
+        Log::info(request()->all());
+        return parent::installApp();
+    }
+
     protected static function getSettingData()
 	{
 		$return = [];

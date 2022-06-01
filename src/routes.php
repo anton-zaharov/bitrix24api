@@ -2,11 +2,12 @@
 
 use Illuminate\Filesystem\Filesystem;
 use Bitrix24api\CRest;
+use Illuminate\Support\Facades\Log;
 
 $this->app->router->post('install.php', function(Filesystem $files) {
     $path = app()->basePath('app/Bitrix24');
     $files->ensureDirectoryExists($path);
-    
+    Log::info('call reinstall');
     
     try {
         $files->requireOnce(__DIR__ . "/bin/install.php");

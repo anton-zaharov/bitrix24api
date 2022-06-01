@@ -85,6 +85,7 @@ class Import extends GeneratorCommand {
         }
         
         $this->entity = $entity;
+        $entity_id = $this->option('entity_id');
         switch ("$module.$entity") {
 
             case 'crm.Deal':
@@ -109,13 +110,12 @@ class Import extends GeneratorCommand {
             case 'calendar.resource':
                 $this->template = 'Class';
                 $this->type = $this->option('class')??$entity;
-                $entity_id = $this->option('entity_id');
                 $this->statuses($entity, $module, $entity_id);
                 break;
             default:
                 $this->template = 'BaseEntity';
                 $this->type = "/Base/Base$entity";
-                $res = $this->withSetters($list??$entity, $module);
+                $res = $this->withSetters($list??$entity, $module, $entity_id);
                 $this->flatten();
                 parent::handle();
                 $this->content = [];
@@ -139,9 +139,9 @@ class Import extends GeneratorCommand {
         }
     }
 
-    protected function withSetters($entity, $module) {
+    protected function withSetters($entity, $module, $entityTypeId) {
         $method = is_array($entity)?implode('.', $entity):$entity;
-        $res = ImportBitrix::EntityFields($method, $module);
+        $res = ImportBitrix::EntityFields($method, $module, $entityTypeId);
 
         foreach ($res ?? [] as $key => $r) {
             if (str_starts_with($key, 'UF')) {
