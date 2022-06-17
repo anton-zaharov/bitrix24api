@@ -17,7 +17,9 @@ class LocalCache extends GeneratorCommand {
      * @var string
      */
     protected $signature = 'bitrix:migration 
-                           {name : Импортируемая сущность}'
+                           {name : Импортируемая сущность}
+                           {--method=fields}
+                           {--entity_id=null}'
     ;
 
     /**
@@ -73,20 +75,33 @@ class LocalCache extends GeneratorCommand {
         } else {
             $entity = $name;
         }
-        
-        $res = ImportBitrix::EntityFields($entity, $module);
+        $method = $this->option('method');
+        $entityId = $this->option('entity_id');
+        $res = ImportBitrix::EntityFields($entity, $module, $entityId, $method);
         $content = [];
         foreach ($res as $key=>$field) {
             $content[] = match($field['type']) {
-                'integer' => "\$table->integer('{$key}')" 
+                'integer','crm_entity' => "\$table->integer('{$key}')" 
                     .(Str::upper($key)==='ID'?'->unique()':'')
                     .(!$field['isRequired']?'->nullable()':'')    
                     .';',
-                'datetime', 'string', 'char' => "\$table->string('{$key}', 255)"
+                'double',        
+                'crm_currency', 'string', 'char', 'crm_status' => "\$table->string('{$key}', 255)"
                     . (!$field['isRequired']?'->nullable()':'')    
-                    .';',    
-                default => null        
-            };
+                    .';',
+                'boolean' => "\$table->boolean('{$key}', 255)"
+                    . (!$field['isRequired']?'->nullable()':'') 
+                    . ';', 
+                'date', 'datetime' => "\$table->{$field['type']}('{$key}')"
+                    . (!$field['isRequired']?'->nullable()':'') 
+                    . ';',
+                'crm_multifield' => "\$table->text('{$key}')->nullable();",
+                    Str::startsWith($key,'crm_') => "\$table->integer('{$key}')->nullable();",    
+                    
+                default => "\$table->integer('{$key}')" 
+                    .(!$field['isRequired']?'->nullable()':'')    
+                    .';',
+            } . " // {$field['type']}";
         }
         $this->content = implode(PHP_EOL, array_filter($content));
         parent::handle();

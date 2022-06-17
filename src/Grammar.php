@@ -38,23 +38,22 @@ class Grammar extends GrammarBase {
         $params = [];
         $params['SELECT'] = $query->columns;
         foreach ($query->wheres as $where) {
-            // Get key and strip table name.
+            
             $key = mb_strtoupper($where['column']);
             $dotIx = strrpos($key, '.');
             if ($dotIx !== false) {
                 $key = substr($key, $dotIx + 1);
-
-                // If the key has dot and type = 'Basic', we need to change type to 'In'.
-                // This fixes lazy loads.
-                if ($where['type'] === 'Basic') {
-                    $where['type'] = 'In';
-                    $where['values'] = [$where['value']];
-                    unset($where['value']);
+                if (strtolower($key)==='id') {
+                    $where['type'] = 'Find';
+                    $this->selectWord = 'get';
                 }
             }
 
             // Check where type.
             switch ($where['type']) {
+                case 'Find':
+                    $params["id"] = $where['value'];
+                    break;
                 case 'Basic':
                     if (in_array($where['operator'], $operators)) {
                         if (in_array($where['operator'], array_keys($this->converter))) {
@@ -70,7 +69,6 @@ class Grammar extends GrammarBase {
                         $params['entityTypeId'] = $where['value'];
                     } else {
                         $params['filter'][$param] = $where['value'];
-                        
                     }
                     break;
                 case 'In':

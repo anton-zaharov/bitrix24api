@@ -9,6 +9,7 @@ use Illuminate\Database\Grammar as GrammerBase;
 use Illuminate\Database\Query\Processors\Processor as ProcessorBase;
 use Bitrix24api\Processor as Processor;
 use Bitrix24api\CRest;
+use Illuminate\Support\Str;
 
 class Connection extends ConnectionBase
 {
@@ -57,49 +58,16 @@ class Connection extends ConnectionBase
             extract(unserialize($query));
             //dd($params);
             $result =  CRest::call($method, $params);
-            $allRows = $result['result']??[];
+            if (Str::endsWith($method, 'get')) {
+                $allRows = [$result['result']];
+            } else {
+                $allRows = $result['result']??[];
+            }
             if (isset($allRows['items'])) {
                 $allRows = $allRows['items'];
             }
             if (isset($allRows['item'])) {
                 $allRows = [$allRows['item']];
-            }
-            // Convert timezone in datetime keys.
-            $connectionTimezone = $this->getConfig('timezone');
-            if ($connectionTimezone && !empty($result['result'])) {
-                $appTimezone = config('app.timezone');
-                if ($connectionTimezone !== $appTimezone) {
-                    $configDatetimeKeys = $this->getConfig('datetime_keys');
-                    if (!empty($configDatetimeKeys)) {
-                        // Get available datetime keys.
-                        $datetimeKeys = [];
-                        $firstRow = $allRows[0];
-                        foreach ($configDatetimeKeys as $key) {
-                            if (array_key_exists($key, $firstRow)) {
-                                $datetimeKeys[] = $key;
-                            }
-                        }
-                        if (!empty($datetimeKeys)) {
-                            $connDtZone = new DateTimeZone($connectionTimezone);
-                            $appDtZone = new DateTimeZone($appTimezone);
-
-                            // Convert timezone for each object.
-                            foreach ($allRows as &$pRow) {
-                                foreach ($datetimeKeys as $key) {
-                                    $connValue = $pRow[$key];
-
-                                    // Check if it is a correct datetime in 'Y-m-d H:i:s' format.
-                                    if ($connValue != '' && strlen($connValue) === 19 && $connValue !== '0000-00-00 00:00:00') {
-                                        // Convert and save.
-                                        $dt = new DateTime($connValue, $connDtZone);
-                                        $dt->setTimezone($appDtZone);
-                                        $pRow[$key] = $dt->format('Y-m-d H:i:s');
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
             return isset($result['result'])?$allRows:$result;
