@@ -17,9 +17,9 @@ class Import extends GeneratorCommand {
      */
     protected $signature = 'bitrix:import 
                            {name : Импортируемая сущность}
-                           {--entity_id=0}
+                           {--entity_id=0 : Id сущности, если является обязательным параметром api метода}
                            {--force=1}
-                           {--class=}'
+                           {--class= : Кастомное имя создаваемого класса}'
     ;
 
     /**
@@ -118,6 +118,11 @@ class Import extends GeneratorCommand {
                 $res = $this->withSetters($list??$entity, $module, $entity_id);
                 $this->flatten();
                 parent::handle();
+                
+                $this->template = 'Interface';
+                $this->type = "/Base/If$entity";
+                parent::handle();
+                
                 $this->content = [];
                 $this->template = 'Entity';
                 $this->type = $entity;
@@ -171,7 +176,7 @@ class Import extends GeneratorCommand {
 
     protected function makeConsts(&$output, $name, $type, $id, $value) {
         $constSlug = $this->files->get($this->getStubByName('Const'));
-        $output['protected'][] = str_replace(['{{ name }}', '{{ type }}', '{{ id }}', '{{ value }}'],
+        $output['consts'][] = str_replace(['{{ name }}', '{{ type }}', '{{ id }}', '{{ value }}'],
                 [$name, $type, $id, $value], $constSlug);
     }
     
@@ -194,6 +199,7 @@ class Import extends GeneratorCommand {
     protected function replaceMyStubs(&$stub) {
         $stub = str_replace(['{{ attributes }}', '{{attributes}}'], $this->content['attributes'] ?? '', $stub);
         $stub = str_replace(['{{ protected }}', '{{protected}}'], $this->content['protected'] ?? '', $stub);
+        $stub = str_replace(['{{ consts }}', '{{consts}}'], $this->content['consts'] ?? '', $stub);
         $stub = str_replace(['{{ functions }}', '{{functions}}'], $this->content['functions'] ?? '', $stub);
         $stub = str_replace(['{{ module }}', '{{module}}'], $this->content['module'] ?? '', $stub);
 

@@ -7,13 +7,12 @@ use App\Bitrix24\Base\Base{{ entity }};
  * Класс сущности Битрикс24, наследует методы и свойства модели Eloquent
  * Можно переименовать класс с соблюдением стандарта PSR-4
  */
-class {{ class }} extends Base{{ entity }} {
+class {{ class }} extends Base{{ entity }} implements If{{ entity }} {
     protected $table = '{{ module }}.{{ entity }}';
     protected $primaryKey = 'ID';
     public $timestamps = false;
 {{ attributes }}
     
 // add your code here
-
 }
 
