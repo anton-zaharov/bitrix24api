@@ -2,9 +2,21 @@
 Laravel/Lumen eloquent wrapper for bitrix24 api
 
 ## Installation
+Add github repo to composer.json
+```
+"repositories": [
+        {
+            "type": "github",
+            "url": "https://github.com/anton-zaharov/bitrix24api.git"
+        }
+    ]
+```
+
+then 
+
 `composer require anton-zaharov/bitrix24api`
 
-add into bootstrap/app.php
+Add into bootstrap/app.php
 
 `$app->register('Bitrix24api\ServiceProvider');`
 
