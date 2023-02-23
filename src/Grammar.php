@@ -37,6 +37,7 @@ class Grammar extends GrammarBase {
         $operators = &$query->operators;
         $params = [];
         $params['SELECT'] = $query->columns;
+        
         foreach ($query->wheres as $where) {
             
             $key = mb_strtoupper($where['column']);
@@ -46,14 +47,14 @@ class Grammar extends GrammarBase {
                 if (strtolower($key)==='id') {
                     $where['type'] = 'Find';
                     $this->selectWord = 'get';
+                    $params["id"] = $where['value'];
+                    unset($params['filter']);
+                    break;
                 }
             }
-
+            
             // Check where type.
             switch ($where['type']) {
-                case 'Find':
-                    $params["id"] = $where['value'];
-                    break;
                 case 'Basic':
                     if (in_array($where['operator'], $operators)) {
                         if (in_array($where['operator'], array_keys($this->converter))) {
@@ -92,6 +93,7 @@ class Grammar extends GrammarBase {
                     throw new RuntimeException('Unsupported query where type ' . $where['type']);
             }
         }
+        
         if (!empty($query->orders)) {
             if (count($query->orders) > 1) {
                 throw new RuntimeException('API query does not support multiple orders');
@@ -108,7 +110,7 @@ class Grammar extends GrammarBase {
         if ($query->limit) {
             $params['per_page'] = $query->limit;
         }
-
+        
         return $params;
     }
 

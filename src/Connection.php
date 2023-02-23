@@ -52,12 +52,12 @@ class Connection extends ConnectionBase
         if (!$query) {
             return [];
         }
-
+        
         return $this->run($query, $bindings, function ($query, $bindings) {
-            
             extract(unserialize($query));
-            //dd($params);
             $result =  CRest::call($method, $params);
+            //dd($method, $params, $result);
+            if (isset($result['error'])) { return null; }
             if (Str::endsWith($method, 'get')) {
                 $allRows = [$result['result']];
             } else {
@@ -69,7 +69,6 @@ class Connection extends ConnectionBase
             if (isset($allRows['item'])) {
                 $allRows = [$allRows['item']];
             }
-
             return isset($result['result'])?$allRows:$result;
         });
     }

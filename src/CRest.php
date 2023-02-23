@@ -11,8 +11,7 @@ use Illuminate\Support\Facades\Log;
  */
 class CRest extends BaseRest {
     public static function installApp(){
-        Log::info($_REQUEST);
-        Log::info(request()->all());
+        //Log::info(request()->all());
         return parent::installApp();
     }
 
